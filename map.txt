@@ -1,0 +1,40 @@
+
+    gameBoard
+        board = []
+        getBoard - return board
+        playerMove
+            active player value
+            input
+            cell input - player value
+        populate the board with cells
+
+
+    cell
+        value 
+        getValue return value
+        changeValue value = player
+    players{
+        id
+        value
+        name
+    }
+
+
+    UIController
+        initBoard
+        updateBoard
+
+
+
+    gameContoller
+        board = gameBoard
+        activePlayer = 0;
+
+        switchPlayer = if activePlayer =0 return 1 else 0
+
+        playRound
+            activePlayer
+            input = getinput
+
+    
+
