@@ -31,14 +31,21 @@ function gameBoard(){
 
 function UIController(){
     displayBoard = (board)=>{
-        for(let i =0;i<3;i++){
-            console.log(board.getBoard()[i][0].getCurrent() + " | " + board.getBoard()[i][1].getCurrent() + " | " + board.getBoard()[i][2].getCurrent())
-            console.log();
+        grid = document.querySelector(".grid-container")
+        boxes = grid.children;
+        let i=0;
+        let j =0;
+        for(let k=0;k<9;k++){
+            j=k%3;
+            if(k%3==0 && k!=0){
+                i+=1;
+            }
+            boxes[k].textContent = board.getBoard()[i][j].getCurrent();
         }
-        console.log("--------------");
+        
     }
     displayWinner = (activePlayer) =>{
-        alert(`${activePlayer.name} has won the game!`);
+        console.log(activePlayer.name);
     }
     return{displayBoard,displayWinner};
 }
@@ -49,12 +56,17 @@ function game(){
     players.push(new Player(1,"O","player2"));
     activePlayer = players[0];
 
+    won = false;
+
     board = gameBoard();
     controller = UIController();
 
+    init = ()=>{
+        document.addEventListener("click",playGame);
+        controller.displayBoard(board);
+    }
 
-
-    getActivePlayer= ()=>activePlayer;
+    getActivePlayer = ()=>activePlayer;
 
     checkWin = () =>{
         for(let i =0;i<3;i++){
@@ -63,32 +75,32 @@ function game(){
                 board.getBoard()[i][1].getCurrent() == board.getBoard()[i][2].getCurrent() &&
                 board.getBoard()[i][0].getCurrent() != "--"
             ) {
-                controller.displayBoard(board);
                 controller.displayWinner(activePlayer);
+                won = true;
                 return true;
             } else if (
                 board.getBoard()[0][i].getCurrent() == board.getBoard()[1][i].getCurrent() &&
                 board.getBoard()[1][i].getCurrent() == board.getBoard()[2][i].getCurrent() &&
                 board.getBoard()[0][i].getCurrent() != "--"
             ) {
-                controller.displayBoard(board);
                 controller.displayWinner(activePlayer);
+                won = true;
                 return true;
             } else if (
                 board.getBoard()[0][0].getCurrent() == board.getBoard()[1][1].getCurrent() &&
                 board.getBoard()[1][1].getCurrent() == board.getBoard()[2][2].getCurrent() &&
                 board.getBoard()[0][0].getCurrent() != "--"
             ) {
-                controller.displayBoard(board);
                 controller.displayWinner(activePlayer);
+                won = true;
                 return true;
             } else if (
                 board.getBoard()[2][0].getCurrent() == board.getBoard()[1][1].getCurrent() &&
                 board.getBoard()[1][1].getCurrent() == board.getBoard()[0][2].getCurrent() &&
                 board.getBoard()[2][0].getCurrent() != "--"
             ) {
-                controller.displayBoard(board);
                 controller.displayWinner(activePlayer);
+                won = true;
                 return true;
             }
             
@@ -104,38 +116,28 @@ function game(){
             activePlayer=players[0];
     }
 
-    getInput = (player)=>{
-        
-        let line = prompt(`Its ${player.name} turn! Whats your move line?: `);
-        let column = prompt(`Its ${player.name} turn! Whats your move column?: `);
-        current = board.getBoard()[line][column];
-        while(!(current.getCurrent()=="--")){
-            alert("SAME SPOT!INVALID");
-            let line = prompt(`Its ${player.name} turn! Whats your move line?: `);
-            let column = prompt(`Its ${player.name} turn! Whats your move column?: `);
-            current = board.getBoard()[line][column];
+    playGame = (event)=>{
+        if(won == false){
+            if(event.target.classList.contains("box")){
+                controller.displayBoard(board);
+                id = event.target.id;
+                player = getActivePlayer();
+                cell = board.getBoard()[Math.floor(id/3)][id%3]
+                cell.changeCurrent(player);
+                controller.displayBoard(board);
+
+                checkWin();
+                switchPlayer();
+                
+            }
         }
-        current.changeCurrent(player);
 
         
     }
 
-    playRound = ()=>{
-        controller.displayBoard(board);
-        player = getActivePlayer();
-        getInput(player);
-    }
-
-    return{playRound,getInput,getActivePlayer,switchPlayer,checkWin};
+    return{playGame,getActivePlayer,switchPlayer,checkWin,init};
 }
 
 game  = game();
 
-while(true){  
-    game.playRound();
-    if(game.checkWin() == true){
-        break;
-    }
-    else
-        game.switchPlayer();  
-}
+game.init();
