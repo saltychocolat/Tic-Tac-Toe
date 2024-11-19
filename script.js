@@ -1,8 +1,9 @@
 class Player{
-    constructor(id,value,name){
+    constructor(id,value,name,score){
         this.id=id;
         this.value =value;
         this.name = name;
+        this.score = score
     }
 }
 
@@ -19,14 +20,17 @@ function gameBoard(){
     let board = [];
     getBoard = ()=> board;
 
-    for(let i =0;i<3;i++){
-        row =[]
-        for(let j =0;j<3;j++){
-            row.push(Cell())
+    initBoard = ()=>{
+        board = []
+        for(let i =0;i<3;i++){
+            row =[]
+            for(let j =0;j<3;j++){
+                row.push(Cell())
+            }
+            board.push(row)
         }
-        board.push(row)
     }
-    return {getBoard};
+    return {getBoard,initBoard};
 }
 
 function UIController(){
@@ -51,23 +55,45 @@ function UIController(){
 }
 
 function game(){
+    activePlayer = null;
     players = []
-    players.push(new Player(0,"X","player1"));
-    players.push(new Player(1,"O","player2"));
-    activePlayer = players[0];
-
     won = false;
 
     board = gameBoard();
+    board.initBoard()
     controller = UIController();
 
     init = ()=>{
-        document.addEventListener("click",playGame);
+        if(players.length == 0){
+            players.push(new Player(0,"X","player1",0));
+            players.push(new Player(1,"O","player2",0));
+        }
+        won =false;
+        displayScore();
+        board.initBoard();
+        activePlayer = players[0];  
         controller.displayBoard(board);
     }
 
+    displayScore = ()=>{
+        score1 = document.querySelector(".score1");
+        score2 = document.querySelector(".score2");
+        score1.textContent = `${players[0].name} score: ${players[0].score}`;
+        score2.textContent = `${players[1].name} score: ${players[1].score}`;
+    }
+    getPlayers = ()=>players;
+
     getActivePlayer = ()=>activePlayer;
 
+    updatePlayers = (name1,name2)=>{
+        players = [
+            new Player(0,"X",name1,0),
+            new Player(0,"O",name2,0),
+        ]
+        activePlayer = players[0];
+        displayScore();
+
+    }
     checkWin = () =>{
         for(let i =0;i<3;i++){
             if (
@@ -76,6 +102,7 @@ function game(){
                 board.getBoard()[i][0].getCurrent() != "--"
             ) {
                 controller.displayWinner(activePlayer);
+                activePlayer.score+=1;
                 won = true;
                 return true;
             } else if (
@@ -84,6 +111,7 @@ function game(){
                 board.getBoard()[0][i].getCurrent() != "--"
             ) {
                 controller.displayWinner(activePlayer);
+                activePlayer.score+=1;
                 won = true;
                 return true;
             } else if (
@@ -92,6 +120,7 @@ function game(){
                 board.getBoard()[0][0].getCurrent() != "--"
             ) {
                 controller.displayWinner(activePlayer);
+                activePlayer.score+=1;
                 won = true;
                 return true;
             } else if (
@@ -100,6 +129,7 @@ function game(){
                 board.getBoard()[2][0].getCurrent() != "--"
             ) {
                 controller.displayWinner(activePlayer);
+                activePlayer.score+=1;
                 won = true;
                 return true;
             }
@@ -127,6 +157,7 @@ function game(){
                 controller.displayBoard(board);
 
                 checkWin();
+                displayScore();
                 switchPlayer();
                 
             }
@@ -135,9 +166,39 @@ function game(){
         
     }
 
-    return{playGame,getActivePlayer,switchPlayer,checkWin,init};
+    return{playGame,getActivePlayer,switchPlayer,checkWin,init,getPlayers,updatePlayers,displayScore};
 }
 
-game  = game();
 
-game.init();
+const gameInstance = game();
+gameInstance.init();
+
+
+document.addEventListener("click",gameInstance.playGame.bind(gameInstance));
+
+
+enterNames = document.querySelector(".enterNames")
+submitNames = document.querySelector(".submitNames");
+startButton = document.querySelector(".startButton");
+
+player1 = document.querySelector("#player1");
+player2 = document.querySelector("#player2");
+
+dialog = document.querySelector("dialog");
+
+enterNames.addEventListener("click",()=> dialog.show())
+submitNames.addEventListener("click",function(event){
+    event.preventDefault();
+    player1Name =  player1.value;
+    player2Name =  player2.value;
+    players = gameInstance.getPlayers();
+    gameInstance.updatePlayers(player1Name,player2Name);
+
+    player1.value = "";
+    player2.value = "";
+    dialog.close()
+})
+
+startButton.addEventListener("click",()=> gameInstance.init());
+
+

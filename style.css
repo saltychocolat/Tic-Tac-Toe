@@ -15,6 +15,7 @@ html,body{
     align-items: center;
 }
 .header{
+    padding: 10px;
     margin-bottom: 20px;
     text-align: center;
     width: 100%;
@@ -35,10 +36,25 @@ html,body{
     margin-right: 30px;
 }
 .grid-container{
+    width: 105%;
     display: grid;
     grid-template-columns: repeat(3,150px);
     grid-template-rows: repeat(3,150px);
     gap: 20px;
+}
+.left{
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: start;
+
+}
+
+.content{
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+
 }
 .box{
     width: 100%;
@@ -47,4 +63,23 @@ html,body{
     display: flex;
     justify-content: center;
     align-items: center;
+}
+dialog{
+    margin-left: 60px;
+    border: 0;
+
+
+}
+form{
+    display: flex;
+    flex-direction: column;
+}
+.right{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}
+.enterNames{
+    padding: 5px;
 }
